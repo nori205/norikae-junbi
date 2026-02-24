@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>スマホ乗り換え準備</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Koto Mincho", "Yu Gothic", sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      padding: 24px 0 20px;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #2d3748;
+      letter-spacing: 0.02em;
+    }
+
+    header p {
+      font-size: 0.8rem;
+      color: #718096;
+      margin-top: 4px;
+    }
+
+    .save-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      color: #48bb78;
+      background: #f0fff4;
+      border: 1px solid #c6f6d5;
+      border-radius: 20px;
+      padding: 3px 10px;
+      margin-top: 8px;
+      transition: opacity 0.4s;
+    }
+
+    .save-badge.hidden { opacity: 0; }
+
+    .save-badge::before {
+      content: "✓";
+      font-weight: 700;
+    }
+
+    /* ── Line card ── */
+    .line-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    .line-card.is-new {
+      animation: cardIn 0.22s ease-out;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .line-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .line-number {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #2d3748;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .line-number::before {
+      content: "";
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #667eea;
+      flex-shrink: 0;
+    }
+
+    .btn-delete-line {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: #e53e3e;
+      background: transparent;
+      border: 1.5px solid #fc8181;
+      border-radius: 8px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-delete-line:hover  { background: #fff5f5; }
+    .btn-delete-line:active { background: #fed7d7; }
+
+    /* ── Section label (like card-title but inside a line card) ── */
+    .section-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a0aec0;
+      margin-bottom: 14px;
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-label:first-of-type { margin-top: 0; }
+
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #e2e8f0;
+    }
+
+    /* ── Fields ── */
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    textarea {
+      width: 100%;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      color: #2d3748;
+      background: #fafafa;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+      outline: none;
+    }
+
+    input[type="text"]:focus,
+    input[type="tel"]:focus,
+    textarea:focus {
+      border-color: #667eea;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.12);
+    }
+
+    input[type="tel"] {
+      letter-spacing: 0.06em;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+      line-height: 1.6;
+    }
+
+    /* ── Checklist ── */
+    .checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .check-item:active { background: #f7fafc; }
+
+    .check-box {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #cbd5e0;
+      border-radius: 7px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s, background 0.2s;
+      background: #fff;
+    }
+
+    .check-item.checked .check-box {
+      background: #667eea;
+      border-color: #667eea;
+    }
+
+    .check-icon {
+      width: 13px;
+      height: 10px;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: opacity 0.18s, transform 0.18s;
+    }
+
+    .check-item.checked .check-icon {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .check-label {
+      font-size: 0.96rem;
+      color: #2d3748;
+      transition: color 0.2s;
+    }
+
+    .check-item.checked .check-label {
+      color: #a0aec0;
+      text-decoration: line-through;
+      text-decoration-color: #a0aec0;
+      text-decoration-thickness: 1.5px;
+    }
+
+    .check-item + .check-item {
+      border-top: 1px solid #f0f4f8;
+    }
+
+    /* ── Add line button ── */
+    .btn-add-line {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border: 2px dashed #c3d3f5;
+      background: transparent;
+      color: #667eea;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s, color 0.18s;
+      margin-bottom: 12px;
+      letter-spacing: 0.03em;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-add-line:hover  { background: #ebf4ff; border-color: #667eea; }
+    .btn-add-line:active { background: #dbeafe; }
+
+    /* ── Reset button ── */
+    .btn-reset {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      border: 1.5px solid #fc8181;
+      background: transparent;
+      color: #e53e3e;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      margin-bottom: 32px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-reset:hover  { background: #fff5f5; }
+    .btn-reset:active { background: #fed7d7; }
+
+    /* ── Confirm dialog ── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .overlay.show { display: flex; }
+
+    .dialog {
+      background: #fff;
+      border-radius: 18px;
+      padding: 28px 24px 20px;
+      max-width: 320px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .dialog h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #2d3748;
+    }
+
+    .dialog p {
+      font-size: 0.84rem;
+      color: #718096;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .dialog-btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-cancel,
+    .btn-confirm {
+      flex: 1;
+      padding: 11px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s;
+    }
+
+    .btn-cancel  { background: #edf2f7; color: #4a5568; }
+    .btn-cancel:hover { background: #e2e8f0; }
+
+    .btn-confirm  { background: #e53e3e; color: #fff; }
+    .btn-confirm:hover { background: #c53030; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <h1>スマホ乗り換え準備</h1>
+      <p>入力内容はブラウザに自動保存されます</p>
+      <span class="save-badge hidden" id="saveBadge">保存しました</span>
+    </header>
+
+    <!-- 回線カードが動的に挿入される -->
+    <div id="linesContainer"></div>
+
+    <button class="btn-add-line" id="addLineBtn">＋ 新しい回線を追加</button>
+    <button class="btn-reset" id="resetBtn">入力内容をすべてリセット</button>
+
+  </div>
+
+  <!-- 確認ダイアログ -->
+  <div class="overlay" id="overlay">
+    <div class="dialog">
+      <h2 id="dialogTitle"></h2>
+      <p id="dialogDesc"></p>
+      <div class="dialog-btns">
+        <button class="btn-cancel" id="cancelBtn">キャンセル</button>
+        <button class="btn-confirm" id="confirmBtn"></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+
+    const STORAGE_KEY = 'mnp_prep_v2';
+    const OLD_KEY     = 'mnp_prep_data';   // 旧バージョンからの移行用
+
+    const CHECK_DEFS = [
+      { key: 'mynumber', label: 'マイナンバーカード' },
+      { key: 'credit',   label: 'クレジットカード' },
+      { key: 'license',  label: '免許証' },
+    ];
+
+    const TEXT_FIELDS = ['phone', 'currentCarrier', 'mnp', 'newCarrier', 'contractName', 'userName', 'memo'];
+
+    // ── データ ──────────────────────────────────────────────
+    function emptyLine() {
+      return {
+        phone: '', currentCarrier: '', mnp: '', newCarrier: '',
+        contractName: '', userName: '', memo: '',
+        checks: { mynumber: false, credit: false, license: false },
+      };
+    }
+
+    let lines = [emptyLine()];
+    let saveTimer = null;
+    let pendingAction = null; // { type: 'delete', index } | { type: 'reset' }
+
+    // ── 保存・読み込み ──────────────────────────────────────
+    function collectLine(i) {
+      const p = `l${i}`;
+      const line = { checks: {} };
+      TEXT_FIELDS.forEach(f => {
+        const el = document.getElementById(`${p}-${f}`);
+        line[f] = el ? el.value : '';
+      });
+      CHECK_DEFS.forEach(c => {
+        const el = document.getElementById(`${p}-check-${c.key}`);
+        line.checks[c.key] = el ? el.classList.contains('checked') : false;
+      });
+      return line;
+    }
+
+    function collectAll() {
+      return lines.map((_, i) => collectLine(i));
+    }
+
+    function save() {
+      lines = collectAll();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
+      showSaveBadge();
+    }
+
+    function debouncedSave() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(save, 400);
+    }
+
+    function showSaveBadge() {
+      const badge = document.getElementById('saveBadge');
+      badge.classList.remove('hidden');
+      clearTimeout(badge._timer);
+      badge._timer = setTimeout(() => badge.classList.add('hidden'), 2000);
+    }
+
+    function load() {
+      try {
+        // 新フォーマット
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const data = JSON.parse(raw);
+          if (Array.isArray(data) && data.length > 0) { lines = data; return; }
+        }
+        // 旧フォーマットから移行
+        const oldRaw = localStorage.getItem(OLD_KEY);
+        if (oldRaw) {
+          const old = JSON.parse(oldRaw);
+          const line = emptyLine();
+          TEXT_FIELDS.forEach(f => { if (old[f] !== undefined) line[f] = old[f]; });
+          if (old['check-mynumber']) line.checks.mynumber = true;
+          if (old['check-credit'])   line.checks.credit   = true;
+          if (old['check-license'])  line.checks.license  = true;
+          lines = [line];
+        }
+      } catch (e) { /* 無視 */ }
+    }
+
+    // ── DOM 生成 ─────────────────────────────────────────────
+    const CHECK_SVG = `<svg class="check-icon" viewBox="0 0 13 10" fill="none">
+      <polyline points="1,5 4.5,9 12,1" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+
+    function esc(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function buildCard(line, i, isNew) {
+      const p = `l${i}`;
+      const card = document.createElement('div');
+      card.className = 'line-card' + (isNew ? ' is-new' : '');
+      card.dataset.index = i;
+
+      card.innerHTML = `
+        <div class="line-header">
+          <span class="line-number">回線 ${i + 1}</span>
+          <button class="btn-delete-line" type="button">この回線を削除</button>
+        </div>
+
+        <div class="section-label">契約情報</div>
+
+        <div class="field">
+          <label for="${p}-phone">電話番号</label>
+          <input type="tel" id="${p}-phone" placeholder="090-0000-0000" inputmode="tel" value="${esc(line.phone)}">
+        </div>
+        <div class="field">
+          <label for="${p}-currentCarrier">現在の契約会社名</label>
+          <input type="text" id="${p}-currentCarrier" placeholder="例：docomo、au、SoftBank など" value="${esc(line.currentCarrier)}">
+        </div>
+        <div class="field">
+          <label for="${p}-mnp">MNP 予約番号</label>
+          <input type="tel" id="${p}-mnp" placeholder="10桁の番号" inputmode="numeric" maxlength="10" value="${esc(line.mnp)}">
+        </div>
+        <div class="field">
+          <label for="${p}-newCarrier">乗り換え先の携帯会社名</label>
+          <input type="text" id="${p}-newCarrier" placeholder="例：楽天モバイル、IIJmio など" value="${esc(line.newCarrier)}">
+        </div>
+        <div class="field">
+          <label for="${p}-contractName">契約者名</label>
+          <input type="text" id="${p}-contractName" placeholder="契約名義人のお名前" value="${esc(line.contractName)}">
+        </div>
+        <div class="field">
+          <label for="${p}-userName">使用者名</label>
+          <input type="text" id="${p}-userName" placeholder="実際に使用する方のお名前" value="${esc(line.userName)}">
+        </div>
+
+        <div class="section-label">持ち物チェックリスト</div>
+
+        <div class="checklist">
+          ${CHECK_DEFS.map(c => `
+            <div class="check-item${line.checks[c.key] ? ' checked' : ''}"
+                 id="${p}-check-${c.key}" role="checkbox"
+                 tabindex="0" aria-checked="${line.checks[c.key]}">
+              <div class="check-box">${CHECK_SVG}</div>
+              <span class="check-label">${esc(c.label)}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="section-label">備考</div>
+
+        <div class="field">
+          <textarea id="${p}-memo" placeholder="メモ、注意事項など自由に入力してください…">${esc(line.memo)}</textarea>
+        </div>
+      `;
+
+      // テキスト入力
+      TEXT_FIELDS.forEach(f => {
+        card.querySelector(`#${p}-${f}`).addEventListener('input', debouncedSave);
+      });
+
+      // チェックリスト
+      CHECK_DEFS.forEach(c => {
+        const el = card.querySelector(`#${p}-check-${c.key}`);
+        function toggle() {
+          el.classList.toggle('checked');
+          el.setAttribute('aria-checked', el.classList.contains('checked'));
+          save();
+        }
+        el.addEventListener('click', toggle);
+        el.addEventListener('keydown', e => {
+          if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); }
+        });
+      });
+
+      // 削除ボタン
+      card.querySelector('.btn-delete-line').addEventListener('click', () => {
+        openDialog('delete', i);
+      });
+
+      return card;
+    }
+
+    function render(newIndex = null) {
+      const container = document.getElementById('linesContainer');
+      container.innerHTML = '';
+      lines.forEach((line, i) => {
+        container.appendChild(buildCard(line, i, i === newIndex));
+      });
+    }
+
+    // ── ダイアログ ──────────────────────────────────────────
+    function openDialog(type, index = null) {
+      pendingAction = { type, index };
+      const title   = document.getElementById('dialogTitle');
+      const desc    = document.getElementById('dialogDesc');
+      const confirm = document.getElementById('confirmBtn');
+
+      if (type === 'delete') {
+        title.textContent   = `回線 ${index + 1} を削除`;
+        desc.innerHTML      = `回線 ${index + 1} の入力内容を<br>すべて削除します。<br>この操作は元に戻せません。`;
+        confirm.textContent = '削除する';
+      } else {
+        title.textContent   = 'リセットの確認';
+        desc.innerHTML      = '入力したすべての内容と<br>チェックリストを削除します。<br>この操作は元に戻せません。';
+        confirm.textContent = 'リセットする';
+      }
+
+      document.getElementById('overlay').classList.add('show');
+    }
+
+    function closeDialog() {
+      document.getElementById('overlay').classList.remove('show');
+      pendingAction = null;
+    }
+
+    // ── イベント ─────────────────────────────────────────────
+    document.getElementById('addLineBtn').addEventListener('click', () => {
+      lines = collectAll();
+      lines.push(emptyLine());
+      const newIndex = lines.length - 1;
+      render(newIndex);
+      save();
+      // 新しいカードへスクロール
+      const cards = document.querySelectorAll('.line-card');
+      if (cards.length) {
+        cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => openDialog('reset'));
+    document.getElementById('cancelBtn').addEventListener('click', closeDialog);
+
+    document.getElementById('overlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('overlay')) closeDialog();
+    });
+
+    document.getElementById('confirmBtn').addEventListener('click', () => {
+      if (!pendingAction) return;
+
+      if (pendingAction.type === 'delete') {
+        lines = collectAll();
+        lines.splice(pendingAction.index, 1);
+        if (lines.length === 0) lines = [emptyLine()];
+      } else {
+        lines = [emptyLine()];
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
+      render();
+      closeDialog();
+      showSaveBadge();
+    });
+
+    // ── 初期化 ───────────────────────────────────────────────
+    load();
+    render();
+  </script>
+</body>
+</html>
