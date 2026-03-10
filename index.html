@@ -404,11 +404,7 @@
 
     /* ── Print styles ── */
     @media print {
-      body {
-        background: #fff;
-        padding: 8px;
-        color: #000;
-      }
+      body { background: #fff; padding: 8px; color: #000; }
 
       .container { max-width: 100%; }
 
@@ -422,30 +418,71 @@
         display: none !important;
       }
 
-      header {
-        padding: 8px 0 12px;
+      header { padding: 6px 0 10px; }
+
+      /* 2カラムグリッド */
+      #linesContainer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
       }
 
       .line-card {
         box-shadow: none;
         border: 1px solid #cbd5e0;
+        border-radius: 8px;
         break-inside: avoid;
         page-break-inside: avoid;
-        margin-bottom: 20px;
+        margin-bottom: 0;
+        padding: 12px;
+      }
+
+      .line-header {
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+      }
+
+      .section-label {
+        font-size: 0.65rem;
+        margin-top: 8px;
+        margin-bottom: 6px;
+      }
+
+      /* フィールドをラベル+値の横並びに */
+      .field {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        margin-bottom: 4px;
+      }
+
+      label {
+        min-width: 76px;
+        flex-shrink: 0;
+        font-size: 0.68rem;
+        margin-bottom: 0;
       }
 
       input[type="text"],
       input[type="tel"],
       textarea {
+        flex: 1;
         border: none;
         border-bottom: 1px solid #a0aec0;
         border-radius: 0;
         background: transparent;
-        padding: 4px 0;
-        font-size: 0.95rem;
+        padding: 1px 0;
+        font-size: 0.82rem;
       }
 
-      textarea { min-height: 50px; }
+      textarea { min-height: 32px; resize: none; }
+
+      /* チェックリストを横並びに */
+      .checklist { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+
+      .check-item { padding: 3px 0; }
+      .check-item + .check-item { border-top: none; }
+      .check-label { font-size: 0.82rem; }
 
       .check-box {
         print-color-adjust: exact;
@@ -459,10 +496,7 @@
         -webkit-print-color-adjust: exact;
       }
 
-      .check-item.checked .check-icon {
-        opacity: 1;
-        transform: scale(1);
-      }
+      .check-item.checked .check-icon { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
