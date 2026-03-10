@@ -404,7 +404,7 @@
 
     /* ── Print styles ── */
     @media print {
-      body { background: #fff; padding: 8px; color: #000; }
+      body { background: #fff; padding: 5mm 8mm; color: #000; }
 
       .container { max-width: 100%; }
 
@@ -414,89 +414,82 @@
       .btn-reset,
       .btn-print,
       .btn-delete-line,
-      .overlay {
+      .overlay,
+      .section-label--checklist,
+      .checklist {
         display: none !important;
       }
 
-      header { padding: 6px 0 10px; }
+      header { padding: 2mm 0 3mm; text-align: left; }
+      header h1 { font-size: 10pt; }
+      header p  { font-size: 7pt; color: #666; margin-top: 1mm; }
 
-      /* 2カラムグリッド */
-      #linesContainer {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
+      #linesContainer { display: block; }
 
       .line-card {
         box-shadow: none;
-        border: 1px solid #cbd5e0;
-        border-radius: 8px;
+        border: 0.5pt solid #aaa;
+        border-radius: 3pt;
         break-inside: avoid;
         page-break-inside: avoid;
-        margin-bottom: 0;
-        padding: 12px;
+        margin-bottom: 2.5mm;
+        padding: 2mm 3mm;
       }
 
       .line-header {
-        padding-bottom: 8px;
-        margin-bottom: 8px;
+        padding-bottom: 1.5mm;
+        margin-bottom: 1.5mm;
+        border-bottom: 0.5pt solid #ccc;
       }
+
+      .line-number { font-size: 8pt; font-weight: 700; }
+      .line-number::before { width: 7px; height: 7px; }
 
       .section-label {
-        font-size: 0.65rem;
-        margin-top: 8px;
-        margin-bottom: 6px;
+        font-size: 6pt;
+        margin-top: 1.5mm;
+        margin-bottom: 1mm;
+        color: #888;
       }
 
-      /* フィールドをラベル+値の横並びに */
+      /* フィールドを2列グリッド */
+      .print-fields-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5mm 5mm;
+      }
+
       .field {
         display: flex;
         align-items: baseline;
-        gap: 6px;
-        margin-bottom: 4px;
+        gap: 2mm;
+        margin-bottom: 0;
       }
 
       label {
-        min-width: 76px;
+        font-size: 6.5pt;
+        font-weight: 600;
+        color: #555;
+        min-width: 46px;
         flex-shrink: 0;
-        font-size: 0.68rem;
         margin-bottom: 0;
+        white-space: nowrap;
       }
 
       input[type="text"],
       input[type="tel"],
       textarea {
         flex: 1;
+        min-width: 0;
         border: none;
-        border-bottom: 1px solid #a0aec0;
+        border-bottom: 0.5pt solid #999;
         border-radius: 0;
         background: transparent;
-        padding: 1px 0;
-        font-size: 0.82rem;
+        padding: 0;
+        font-size: 8pt;
       }
 
-      textarea { min-height: 32px; resize: none; }
-
-      /* チェックリストを横並びに */
-      .checklist { flex-direction: row; flex-wrap: wrap; gap: 8px; }
-
-      .check-item { padding: 3px 0; }
-      .check-item + .check-item { border-top: none; }
-      .check-label { font-size: 0.82rem; }
-
-      .check-box {
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-      }
-
-      .check-item.checked .check-box {
-        background: #667eea;
-        border-color: #667eea;
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-      }
-
-      .check-item.checked .check-icon { opacity: 1; transform: scale(1); }
+      textarea { min-height: 5mm; resize: none; font-size: 7.5pt; }
     }
   </style>
 </head>
@@ -644,36 +637,38 @@
 
         <div class="section-label">契約情報</div>
 
-        <div class="field">
-          <label for="${p}-phone">電話番号</label>
-          <input type="tel" id="${p}-phone" placeholder="090-0000-0000" inputmode="tel" value="${esc(line.phone)}">
-        </div>
-        <div class="field">
-          <label for="${p}-currentCarrier">現在の契約会社名</label>
-          <input type="text" id="${p}-currentCarrier" placeholder="例：docomo、au、SoftBank など" value="${esc(line.currentCarrier)}">
-        </div>
-        <div class="field">
-          <label for="${p}-mnp">MNP 予約番号</label>
-          <input type="tel" id="${p}-mnp" placeholder="10桁の番号" inputmode="numeric" maxlength="10" value="${esc(line.mnp)}">
-        </div>
-        <div class="field">
-          <label for="${p}-pin">契約暗証番号（4桁）</label>
-          <input type="tel" id="${p}-pin" placeholder="0000" inputmode="numeric" maxlength="4" value="${esc(line.pin)}">
-        </div>
-        <div class="field">
-          <label for="${p}-newCarrier">乗り換え先の携帯会社名</label>
-          <input type="text" id="${p}-newCarrier" placeholder="例：楽天モバイル、IIJmio など" value="${esc(line.newCarrier)}">
-        </div>
-        <div class="field">
-          <label for="${p}-contractName">契約者名</label>
-          <input type="text" id="${p}-contractName" placeholder="契約名義人のお名前" value="${esc(line.contractName)}">
-        </div>
-        <div class="field">
-          <label for="${p}-userName">使用者名</label>
-          <input type="text" id="${p}-userName" placeholder="実際に使用する方のお名前" value="${esc(line.userName)}">
+        <div class="print-fields-grid">
+          <div class="field">
+            <label for="${p}-phone">電話番号</label>
+            <input type="tel" id="${p}-phone" placeholder="090-0000-0000" inputmode="tel" value="${esc(line.phone)}">
+          </div>
+          <div class="field">
+            <label for="${p}-currentCarrier">現在の契約会社名</label>
+            <input type="text" id="${p}-currentCarrier" placeholder="例：docomo、au、SoftBank など" value="${esc(line.currentCarrier)}">
+          </div>
+          <div class="field">
+            <label for="${p}-mnp">MNP 予約番号</label>
+            <input type="tel" id="${p}-mnp" placeholder="10桁の番号" inputmode="numeric" maxlength="10" value="${esc(line.mnp)}">
+          </div>
+          <div class="field">
+            <label for="${p}-pin">契約暗証番号（4桁）</label>
+            <input type="tel" id="${p}-pin" placeholder="0000" inputmode="numeric" maxlength="4" value="${esc(line.pin)}">
+          </div>
+          <div class="field">
+            <label for="${p}-newCarrier">乗り換え先の携帯会社名</label>
+            <input type="text" id="${p}-newCarrier" placeholder="例：楽天モバイル、IIJmio など" value="${esc(line.newCarrier)}">
+          </div>
+          <div class="field">
+            <label for="${p}-contractName">契約者名</label>
+            <input type="text" id="${p}-contractName" placeholder="契約名義人のお名前" value="${esc(line.contractName)}">
+          </div>
+          <div class="field">
+            <label for="${p}-userName">使用者名</label>
+            <input type="text" id="${p}-userName" placeholder="実際に使用する方のお名前" value="${esc(line.userName)}">
+          </div>
         </div>
 
-        <div class="section-label">持ち物チェックリスト</div>
+        <div class="section-label section-label--checklist">持ち物チェックリスト</div>
 
         <div class="checklist">
           ${CHECK_DEFS.map(c => `
