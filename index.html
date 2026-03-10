@@ -380,6 +380,90 @@
 
     .btn-confirm  { background: #e53e3e; color: #fff; }
     .btn-confirm:hover { background: #c53030; }
+
+    /* ── Print button ── */
+    .btn-print {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      border: 1.5px solid #667eea;
+      background: transparent;
+      color: #667eea;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      margin-bottom: 12px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-print:hover  { background: #ebf4ff; }
+    .btn-print:active { background: #dbeafe; }
+
+    /* ── Print styles ── */
+    @media print {
+      body {
+        background: #fff;
+        padding: 8px;
+        color: #000;
+      }
+
+      .container { max-width: 100%; }
+
+      .follower-badge,
+      .save-badge,
+      .btn-add-line,
+      .btn-reset,
+      .btn-print,
+      .btn-delete-line,
+      .overlay {
+        display: none !important;
+      }
+
+      header {
+        padding: 8px 0 12px;
+      }
+
+      .line-card {
+        box-shadow: none;
+        border: 1px solid #cbd5e0;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+      }
+
+      input[type="text"],
+      input[type="tel"],
+      textarea {
+        border: none;
+        border-bottom: 1px solid #a0aec0;
+        border-radius: 0;
+        background: transparent;
+        padding: 4px 0;
+        font-size: 0.95rem;
+      }
+
+      textarea { min-height: 50px; }
+
+      .check-box {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .check-item.checked .check-box {
+        background: #667eea;
+        border-color: #667eea;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .check-item.checked .check-icon {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
   </style>
 </head>
 <body>
@@ -396,6 +480,7 @@
     <div id="linesContainer"></div>
 
     <button class="btn-add-line" id="addLineBtn">＋ 新しい回線を追加</button>
+    <button class="btn-print" id="printBtn">🖨️ 印刷 / PDF で保存</button>
     <button class="btn-reset" id="resetBtn">入力内容をすべてリセット</button>
 
   </div>
@@ -646,6 +731,11 @@
       if (cards.length) {
         cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+    });
+
+    document.getElementById('printBtn').addEventListener('click', () => {
+      save();
+      window.print();
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => openDialog('reset'));
