@@ -448,7 +448,7 @@
       /* 削除ボタン：核オプション */
       .line-header {
         display: block !important;
-        padding-bottom: 1.5mm;
+        padding-bottom: 1mm;
         margin-bottom: 1mm;
         border-bottom: 0.5pt solid #000;
       }
@@ -497,32 +497,32 @@
         border-radius: 2pt;
         break-inside: avoid;
         page-break-inside: avoid;
-        margin-bottom: 1.5mm;
-        padding: 2mm 2.5mm;
+        margin-bottom: 1mm;
+        padding: 1mm 2.5mm;
       }
 
       /* グローバルカード */
       #globalCard {
         break-inside: avoid;
         page-break-inside: avoid;
-        padding: 2mm 2.5mm;
+        padding: 1.5mm 2.5mm;
         margin-bottom: 1.5mm;
       }
       #globalCard .section-label {
         margin-top: 0.5mm;
         margin-bottom: 0.3mm;
       }
-      #globalCard textarea { min-height: 5mm; font-size: 7.5pt; }
+      #globalCard textarea { min-height: 3.5mm; font-size: 7pt; }
 
       /* 回線番号 */
-      .line-number { font-size: 9pt; font-weight: 700; color: #000; }
+      .line-number { font-size: 8pt; font-weight: 700; color: #000; }
       .line-number::before { width: 6px; height: 6px; background: #000; }
 
       /* セクションラベル */
       .section-label {
-        font-size: 6.5pt;
-        margin-top: 1.5mm;
-        margin-bottom: 0.8mm;
+        font-size: 5.5pt;
+        margin-top: 1mm;
+        margin-bottom: 0.5mm;
         color: #000;
       }
       .section-label::after { background: #000; }
@@ -531,7 +531,7 @@
       .print-fields-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 0.8mm 4mm;
+        gap: 0.3mm 4mm;
       }
       .field {
         display: flex;
@@ -540,10 +540,10 @@
         margin-bottom: 0;
       }
       label {
-        font-size: 6.5pt;
+        font-size: 6pt;
         font-weight: 600;
         color: #000;
-        min-width: 46px;
+        min-width: 44px;
         flex-shrink: 0;
         margin-bottom: 0;
         white-space: nowrap;
@@ -558,10 +558,10 @@
         border-radius: 0;
         background: transparent;
         padding: 0;
-        font-size: 8pt;
+        font-size: 7.5pt;
         color: #000;
       }
-      textarea { min-height: 5mm; resize: none; font-size: 7.5pt; }
+      textarea { min-height: 4mm; resize: none; font-size: 7pt; }
     }
   </style>
 </head>
@@ -891,22 +891,18 @@
       window.print();
     });
 
-    // 印刷時に削除ボタンを確実に非表示（テキストごと消去）
-    window.addEventListener("beforeprint", () => {
-      document.querySelectorAll(".btn-delete-line").forEach(el => {
-        el.dataset.origHtml = el.innerHTML;
-        el.innerHTML = "";
-        el.setAttribute("hidden", "true");
-        el.style.cssText = "display:none!important;visibility:hidden!important;width:0;height:0;overflow:hidden;position:absolute;left:-9999px";
+    // 印刷時に削除ボタンを確実に非表示
+    window.addEventListener('beforeprint', () => {
+      document.querySelectorAll('.btn-delete-line').forEach(el => {
+        el.style.setProperty('display', 'none', 'important');
+        el.style.setProperty('visibility', 'hidden', 'important');
       });
     });
-    window.addEventListener("afterprint", () => {
-      document.querySelectorAll(".btn-delete-line").forEach(el => {
-        if (el.dataset.origHtml !== undefined) el.innerHTML = el.dataset.origHtml;
-        el.removeAttribute("hidden");
-        el.style.cssText = "";
+    window.addEventListener('afterprint', () => {
+      document.querySelectorAll('.btn-delete-line').forEach(el => {
+        el.style.removeProperty('display');
+        el.style.removeProperty('visibility');
       });
-    });
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => openDialog('reset'));
