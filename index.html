@@ -439,23 +439,19 @@
       .btn-reset,
       .btn-print,
       .btn-delete-line,
+      .no-print,
       .overlay,
       .privacy-notice,
       .privacy-notice-screen {
         display: none !important;
       }
 
-      /* 削除ボタン：核オプション */
+      /* line-headerをブロックに（ボタンが残っても影響しないように） */
       .line-header {
         display: block !important;
-        padding-bottom: 1mm;
-        margin-bottom: 1mm;
+        padding-bottom: 1.5mm;
+        margin-bottom: 1.5mm;
         border-bottom: 0.5pt solid #000;
-      }
-      .line-header > *:not(.line-number) {
-        display: none !important;
-        position: absolute !important;
-        left: -9999px !important;
       }
 
       /* ヘッダー */
@@ -479,15 +475,8 @@
         gap: 5mm;
         margin-bottom: 0;
       }
-      #globalCard .check-item {
-        padding: 1mm 3px;
-      }
-      #globalCard .check-box {
-        width: 12px;
-        height: 12px;
-        border-radius: 3px;
-        border-color: #000;
-      }
+      #globalCard .check-item { padding: 1mm 3px; }
+      #globalCard .check-box { width: 12px; height: 12px; border-radius: 3px; border-color: #000; }
       #globalCard .check-label { font-size: 7pt; color: #000; }
 
       /* カード共通 */
@@ -497,32 +486,29 @@
         border-radius: 2pt;
         break-inside: avoid;
         page-break-inside: avoid;
-        margin-bottom: 1mm;
-        padding: 1mm 2.5mm;
+        margin-bottom: 1.5mm;
+        padding: 2mm 2.5mm;
       }
 
       /* グローバルカード */
       #globalCard {
         break-inside: avoid;
         page-break-inside: avoid;
-        padding: 1.5mm 2.5mm;
-        margin-bottom: 1.5mm;
+        padding: 2mm 2.5mm;
+        margin-bottom: 2mm;
       }
-      #globalCard .section-label {
-        margin-top: 0.5mm;
-        margin-bottom: 0.3mm;
-      }
-      #globalCard textarea { min-height: 3.5mm; font-size: 7pt; }
+      #globalCard .section-label { margin-top: 0.5mm; margin-bottom: 0.3mm; }
+      #globalCard textarea { min-height: 5mm; font-size: 7.5pt; }
 
       /* 回線番号 */
-      .line-number { font-size: 8pt; font-weight: 700; color: #000; }
+      .line-number { font-size: 9pt; font-weight: 700; color: #000; }
       .line-number::before { width: 6px; height: 6px; background: #000; }
 
       /* セクションラベル */
       .section-label {
-        font-size: 5.5pt;
-        margin-top: 1mm;
-        margin-bottom: 0.5mm;
+        font-size: 6pt;
+        margin-top: 1.5mm;
+        margin-bottom: 0.8mm;
         color: #000;
       }
       .section-label::after { background: #000; }
@@ -531,7 +517,7 @@
       .print-fields-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 0.3mm 4mm;
+        gap: 0.8mm 4mm;
       }
       .field {
         display: flex;
@@ -540,10 +526,10 @@
         margin-bottom: 0;
       }
       label {
-        font-size: 6pt;
+        font-size: 6.5pt;
         font-weight: 600;
         color: #000;
-        min-width: 44px;
+        min-width: 46px;
         flex-shrink: 0;
         margin-bottom: 0;
         white-space: nowrap;
@@ -558,10 +544,10 @@
         border-radius: 0;
         background: transparent;
         padding: 0;
-        font-size: 7.5pt;
+        font-size: 8pt;
         color: #000;
       }
-      textarea { min-height: 4mm; resize: none; font-size: 7pt; }
+      textarea { min-height: 5mm; resize: none; font-size: 7.5pt; }
     }
   </style>
 </head>
@@ -783,7 +769,7 @@
       card.innerHTML = `
         <div class="line-header">
           <span class="line-number">回線 ${i + 1}</span>
-          <button class="btn-delete-line" type="button">この回線を削除</button>
+          <span class="no-print"><button class="btn-delete-line" type="button">この回線を削除</button></span>
         </div>
 
         <div class="section-label">契約情報</div>
