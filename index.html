@@ -428,159 +428,140 @@
 
     /* ── Print styles ── */
     @media print {
-      body { background: #fff; padding: 4mm 6mm; color: #000; }
-
+      /* 全体 */
+      body { background: #fff; padding: 3mm 5mm; color: #000; }
       .container { max-width: 100%; }
 
+      /* 非表示要素 */
       .follower-badge,
       .save-badge,
       .btn-add-line,
       .btn-reset,
       .btn-print,
       .btn-delete-line,
-      .overlay {
+      .overlay,
+      .privacy-notice,
+      .privacy-notice-screen {
         display: none !important;
       }
 
-      /* 回線カード内のチェックリストは非表示（上部の共通チェックリストに統一） */
+      /* 削除ボタン：核オプション */
+      .line-header {
+        display: block !important;
+        padding-bottom: 1mm;
+        margin-bottom: 1mm;
+        border-bottom: 0.5pt solid #000;
+      }
+      .line-header > *:not(.line-number) {
+        display: none !important;
+        position: absolute !important;
+        left: -9999px !important;
+      }
+
+      /* ヘッダー */
+      header { padding: 1mm 0 2mm; text-align: left; }
+      header h1 { font-size: 9pt; color: #000; }
+      header p  { font-size: 6.5pt; color: #000; margin-top: 0.5mm; }
+
+      /* 回線カードのチェックリスト・備考を非表示 */
       #linesContainer .section-label--checklist,
-      #linesContainer .checklist {
+      #linesContainer .checklist,
+      #linesContainer .line-card > .section-label:last-of-type,
+      #linesContainer .line-card > .field:last-of-type {
         display: none !important;
       }
 
       /* グローバルカードのチェックリストは表示 */
-      #globalCard .section-label--checklist {
-        display: flex !important;
-      }
+      #globalCard .section-label--checklist { display: flex !important; }
       #globalCard .checklist {
         display: flex !important;
-        flex-direction: column;
+        flex-direction: row !important;
+        gap: 5mm;
+        margin-bottom: 0;
       }
+      #globalCard .check-item {
+        padding: 1mm 3px;
+      }
+      #globalCard .check-box {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        border-color: #000;
+      }
+      #globalCard .check-label { font-size: 7pt; color: #000; }
 
-      header { padding: 2mm 0 3mm; text-align: left; }
-      header h1 { font-size: 10pt; }
-      header p  { font-size: 7pt; color: #666; margin-top: 1mm; }
-
-      #linesContainer { display: block; }
-
+      /* カード共通 */
       .line-card {
         box-shadow: none;
-        border: 0.5pt solid #aaa;
-        border-radius: 3pt;
+        border: 0.5pt solid #000;
+        border-radius: 2pt;
         break-inside: avoid;
         page-break-inside: avoid;
-        margin-bottom: 1.5mm;
-        padding: 1.5mm 2.5mm;
+        margin-bottom: 1mm;
+        padding: 1mm 2.5mm;
       }
 
+      /* グローバルカード */
       #globalCard {
         break-inside: avoid;
         page-break-inside: avoid;
-        padding: 2mm 3mm;
-        margin-bottom: 2mm;
-      }
-
-      .line-header {
-        padding-bottom: 1.5mm;
+        padding: 1.5mm 2.5mm;
         margin-bottom: 1.5mm;
-        border-bottom: 0.5pt solid #ccc;
       }
-
-      /* 削除ボタンを確実に非表示 */
-      .line-header button,
-      .btn-delete-line {
-        display: none !important;
-        visibility: hidden !important;
+      #globalCard .section-label {
+        margin-top: 0.5mm;
+        margin-bottom: 0.3mm;
       }
+      #globalCard textarea { min-height: 3.5mm; font-size: 7pt; }
 
-      /* 注意書きは印刷時のみ表示 */
-      .privacy-notice {
-        display: block !important;
-        font-size: 6.5pt;
-        color: #c00;
-        border: 0.5pt solid #c00;
-        border-radius: 3pt;
-        padding: 1mm 2mm;
-        margin-bottom: 2mm;
-        text-align: center;
-      }
+      /* 回線番号 */
+      .line-number { font-size: 8pt; font-weight: 700; color: #000; }
+      .line-number::before { width: 6px; height: 6px; background: #000; }
 
-      .line-number { font-size: 8pt; font-weight: 700; }
-      .line-number::before { width: 7px; height: 7px; }
-
+      /* セクションラベル */
       .section-label {
-        font-size: 6pt;
-        margin-top: 1.5mm;
-        margin-bottom: 1mm;
-        color: #888;
+        font-size: 5.5pt;
+        margin-top: 1mm;
+        margin-bottom: 0.5mm;
+        color: #000;
       }
+      .section-label::after { background: #000; }
 
-      /* フィールドを2列グリッド */
+      /* フィールド2列グリッド */
       .print-fields-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 0.5mm 5mm;
+        gap: 0.3mm 4mm;
       }
-
       .field {
         display: flex;
         align-items: baseline;
-        gap: 2mm;
+        gap: 1.5mm;
         margin-bottom: 0;
       }
-
       label {
-        font-size: 6.5pt;
+        font-size: 6pt;
         font-weight: 600;
-        color: #555;
-        min-width: 46px;
+        color: #000;
+        min-width: 44px;
         flex-shrink: 0;
         margin-bottom: 0;
         white-space: nowrap;
       }
-
       input[type="text"],
       input[type="tel"],
       textarea {
         flex: 1;
         min-width: 0;
         border: none;
-        border-bottom: 0.5pt solid #999;
+        border-bottom: 0.5pt solid #000;
         border-radius: 0;
         background: transparent;
         padding: 0;
-        font-size: 8pt;
+        font-size: 7.5pt;
+        color: #000;
       }
-
-      textarea { min-height: 5mm; resize: none; font-size: 7.5pt; }
-
-      #globalCard textarea { min-height: 4mm; font-size: 7pt; }
-
-      /* グローバルカードのチェックリストを横並び・コンパクトに */
-      #globalCard .checklist {
-        flex-direction: row !important;
-        gap: 5mm;
-        margin-bottom: 1mm;
-      }
-
-      #globalCard .check-item {
-        padding: 1.5mm 3px;
-      }
-
-      #globalCard .check-box {
-        width: 14px;
-        height: 14px;
-        border-radius: 4px;
-      }
-
-      #globalCard .check-label {
-        font-size: 7pt;
-      }
-
-      #globalCard .section-label {
-        margin-top: 1mm;
-        margin-bottom: 0.5mm;
-      }
+      textarea { min-height: 4mm; resize: none; font-size: 7pt; }
     }
   </style>
 </head>
