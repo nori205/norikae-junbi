@@ -414,10 +414,23 @@
       .btn-reset,
       .btn-print,
       .btn-delete-line,
-      .overlay,
-      .section-label--checklist,
-      .checklist {
+      .overlay {
         display: none !important;
+      }
+
+      /* 回線カード内のチェックリストは非表示（上部の共通チェックリストに統一） */
+      #linesContainer .section-label--checklist,
+      #linesContainer .checklist {
+        display: none !important;
+      }
+
+      /* グローバルカードのチェックリストは表示 */
+      #globalCard .section-label--checklist {
+        display: flex !important;
+      }
+      #globalCard .checklist {
+        display: flex !important;
+        flex-direction: column;
       }
 
       header { padding: 2mm 0 3mm; text-align: left; }
@@ -434,6 +447,12 @@
         page-break-inside: avoid;
         margin-bottom: 2.5mm;
         padding: 2mm 3mm;
+      }
+
+      #globalCard {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-bottom: 3mm;
       }
 
       .line-header {
@@ -490,6 +509,8 @@
       }
 
       textarea { min-height: 5mm; resize: none; font-size: 7.5pt; }
+
+      #globalCard textarea { min-height: 8mm; }
     }
   </style>
 </head>
@@ -502,6 +523,22 @@
       <p>入力内容はブラウザに自動保存されます</p>
       <span class="save-badge hidden" id="saveBadge">保存しました</span>
     </header>
+
+    <!-- 共通カード（持ち物チェックリスト＋光・電気メモ） -->
+    <div id="globalCard" class="line-card">
+      <div class="section-label section-label--checklist">持ち物チェックリスト</div>
+      <div class="checklist" id="globalChecklist"></div>
+
+      <div class="section-label">光・電気の乗り換えメモ</div>
+      <div class="field">
+        <label for="global-hikarimemo">光回線</label>
+        <textarea id="global-hikarimemo" placeholder="光回線の乗り換え先、プロバイダ、連絡先など…"></textarea>
+      </div>
+      <div class="field">
+        <label for="global-denkimemo">電気</label>
+        <textarea id="global-denkimemo" placeholder="電気の乗り換え先、料金プラン、手続きなど…"></textarea>
+      </div>
+    </div>
 
     <!-- 回線カードが動的に挿入される -->
     <div id="linesContainer"></div>
@@ -527,8 +564,9 @@
   <script>
     'use strict';
 
-    const STORAGE_KEY = 'mnp_prep_v2';
-    const OLD_KEY     = 'mnp_prep_data';   // 旧バージョンからの移行用
+    const STORAGE_KEY  = 'mnp_prep_v3';
+    const OLD_KEY_V2   = 'mnp_prep_v2';   // v2からの移行用
+    const OLD_KEY_V1   = 'mnp_prep_data'; // v1からの移行用
 
     const CHECK_DEFS = [
       { key: 'mynumber', label: 'マイナンバーカード' },
@@ -547,7 +585,16 @@
       };
     }
 
+    function emptyGlobal() {
+      return {
+        checks: { mynumber: false, credit: false, license: false },
+        hikarimemo: '',
+        denkimemo: '',
+      };
+    }
+
     let lines = [emptyLine()];
+    let globalData = emptyGlobal();
     let saveTimer = null;
     let pendingAction = null; // { type: 'delete', index } | { type: 'reset' }
 
@@ -570,9 +617,23 @@
       return lines.map((_, i) => collectLine(i));
     }
 
+    function collectGlobal() {
+      const checks = {};
+      CHECK_DEFS.forEach(c => {
+        const el = document.getElementById(`global-check-${c.key}`);
+        checks[c.key] = el ? el.classList.contains('checked') : false;
+      });
+      return {
+        checks,
+        hikarimemo: document.getElementById('global-hikarimemo')?.value || '',
+        denkimemo:  document.getElementById('global-denkimemo')?.value  || '',
+      };
+    }
+
     function save() {
       lines = collectAll();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
+      globalData = collectGlobal();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ lines, global: globalData }));
       showSaveBadge();
     }
 
@@ -590,16 +651,26 @@
 
     function load() {
       try {
-        // 新フォーマット
+        // v3フォーマット { lines, global }
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
           const data = JSON.parse(raw);
+          if (data && data.lines && Array.isArray(data.lines) && data.lines.length > 0) {
+            lines = data.lines;
+            if (data.global) globalData = { ...emptyGlobal(), ...data.global };
+            return;
+          }
+        }
+        // v2フォーマット（配列）から移行
+        const v2raw = localStorage.getItem(OLD_KEY_V2);
+        if (v2raw) {
+          const data = JSON.parse(v2raw);
           if (Array.isArray(data) && data.length > 0) { lines = data; return; }
         }
-        // 旧フォーマットから移行
-        const oldRaw = localStorage.getItem(OLD_KEY);
-        if (oldRaw) {
-          const old = JSON.parse(oldRaw);
+        // v1フォーマットから移行
+        const v1raw = localStorage.getItem(OLD_KEY_V1);
+        if (v1raw) {
+          const old = JSON.parse(v1raw);
           const line = emptyLine();
           TEXT_FIELDS.forEach(f => { if (old[f] !== undefined) line[f] = old[f]; });
           if (old['check-mynumber']) line.checks.mynumber = true;
@@ -621,6 +692,37 @@
         .replace(/"/g, '&quot;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
+    }
+
+    function initGlobalCard(data) {
+      const checklist = document.getElementById('globalChecklist');
+      checklist.innerHTML = CHECK_DEFS.map(c => `
+        <div class="check-item${data.checks[c.key] ? ' checked' : ''}"
+             id="global-check-${c.key}" role="checkbox"
+             tabindex="0" aria-checked="${data.checks[c.key]}">
+          <div class="check-box">${CHECK_SVG}</div>
+          <span class="check-label">${esc(c.label)}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('global-hikarimemo').value = data.hikarimemo || '';
+      document.getElementById('global-denkimemo').value  = data.denkimemo  || '';
+
+      CHECK_DEFS.forEach(c => {
+        const el = document.getElementById(`global-check-${c.key}`);
+        function toggle() {
+          el.classList.toggle('checked');
+          el.setAttribute('aria-checked', el.classList.contains('checked'));
+          save();
+        }
+        el.addEventListener('click', toggle);
+        el.addEventListener('keydown', e => {
+          if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); }
+        });
+      });
+
+      document.getElementById('global-hikarimemo').addEventListener('input', debouncedSave);
+      document.getElementById('global-denkimemo').addEventListener('input',  debouncedSave);
     }
 
     function buildCard(line, i, isNew) {
@@ -756,7 +858,7 @@
       render(newIndex);
       save();
       // 新しいカードへスクロール
-      const cards = document.querySelectorAll('.line-card');
+      const cards = document.querySelectorAll('#linesContainer .line-card');
       if (cards.length) {
         cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -783,9 +885,11 @@
         if (lines.length === 0) lines = [emptyLine()];
       } else {
         lines = [emptyLine()];
+        globalData = emptyGlobal();
+        initGlobalCard(globalData);
       }
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ lines, global: globalData }));
       render();
       closeDialog();
       showSaveBadge();
@@ -793,6 +897,7 @@
 
     // ── 初期化 ───────────────────────────────────────────────
     load();
+    initGlobalCard(globalData);
     render();
   </script>
 </body>
