@@ -910,6 +910,20 @@
       window.print();
     });
 
+    // 印刷時に削除ボタンを確実に非表示
+    window.addEventListener('beforeprint', () => {
+      document.querySelectorAll('.btn-delete-line').forEach(el => {
+        el.style.setProperty('display', 'none', 'important');
+        el.style.setProperty('visibility', 'hidden', 'important');
+      });
+    });
+    window.addEventListener('afterprint', () => {
+      document.querySelectorAll('.btn-delete-line').forEach(el => {
+        el.style.removeProperty('display');
+        el.style.removeProperty('visibility');
+      });
+    });
+
     document.getElementById('resetBtn').addEventListener('click', () => openDialog('reset'));
     document.getElementById('cancelBtn').addEventListener('click', closeDialog);
 
