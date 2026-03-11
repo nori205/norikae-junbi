@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+      // 削除ボタン<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -404,7 +404,7 @@
 
     /* ── Print styles ── */
     @media print {
-      body { background: #fff; padding: 5mm 8mm; color: #000; }
+      body { background: #fff; padding: 4mm 6mm; color: #000; }
 
       .container { max-width: 100%; }
 
@@ -445,14 +445,15 @@
         border-radius: 3pt;
         break-inside: avoid;
         page-break-inside: avoid;
-        margin-bottom: 2.5mm;
-        padding: 2mm 3mm;
+        margin-bottom: 1.5mm;
+        padding: 1.5mm 2.5mm;
       }
 
       #globalCard {
         break-inside: avoid;
         page-break-inside: avoid;
-        margin-bottom: 3mm;
+        padding: 2mm 3mm;
+        margin-bottom: 2mm;
       }
 
       .line-header {
@@ -510,7 +511,33 @@
 
       textarea { min-height: 5mm; resize: none; font-size: 7.5pt; }
 
-      #globalCard textarea { min-height: 8mm; }
+      #globalCard textarea { min-height: 4mm; font-size: 7pt; }
+
+      /* グローバルカードのチェックリストを横並び・コンパクトに */
+      #globalCard .checklist {
+        flex-direction: row !important;
+        gap: 5mm;
+        margin-bottom: 1mm;
+      }
+
+      #globalCard .check-item {
+        padding: 1.5mm 3px;
+      }
+
+      #globalCard .check-box {
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+      }
+
+      #globalCard .check-label {
+        font-size: 7pt;
+      }
+
+      #globalCard .section-label {
+        margin-top: 1mm;
+        margin-bottom: 0.5mm;
+      }
     }
   </style>
 </head>
@@ -532,11 +559,11 @@
       <div class="section-label">光・電気の乗り換えメモ</div>
       <div class="field">
         <label for="global-hikarimemo">光回線</label>
-        <textarea id="global-hikarimemo" placeholder="光回線の乗り換え先、プロバイダ、連絡先など…"></textarea>
+        <textarea id="global-hikarimemo" placeholder="必要書類・番号などをメモ（乗り換え先、プロバイダ、連絡先、工事日など）"></textarea>
       </div>
       <div class="field">
         <label for="global-denkimemo">電気</label>
-        <textarea id="global-denkimemo" placeholder="電気の乗り換え先、料金プラン、手続きなど…"></textarea>
+        <textarea id="global-denkimemo" placeholder="必要書類・番号などをメモ（お客様番号、乗り換え先、料金プラン、手続きなど）"></textarea>
       </div>
     </div>
 
@@ -605,10 +632,6 @@
       TEXT_FIELDS.forEach(f => {
         const el = document.getElementById(`${p}-${f}`);
         line[f] = el ? el.value : '';
-      });
-      CHECK_DEFS.forEach(c => {
-        const el = document.getElementById(`${p}-check-${c.key}`);
-        line.checks[c.key] = el ? el.classList.contains('checked') : false;
       });
       return line;
     }
@@ -770,19 +793,6 @@
           </div>
         </div>
 
-        <div class="section-label section-label--checklist">持ち物チェックリスト</div>
-
-        <div class="checklist">
-          ${CHECK_DEFS.map(c => `
-            <div class="check-item${line.checks[c.key] ? ' checked' : ''}"
-                 id="${p}-check-${c.key}" role="checkbox"
-                 tabindex="0" aria-checked="${line.checks[c.key]}">
-              <div class="check-box">${CHECK_SVG}</div>
-              <span class="check-label">${esc(c.label)}</span>
-            </div>
-          `).join('')}
-        </div>
-
         <div class="section-label">備考</div>
 
         <div class="field">
@@ -793,20 +803,6 @@
       // テキスト入力
       TEXT_FIELDS.forEach(f => {
         card.querySelector(`#${p}-${f}`).addEventListener('input', debouncedSave);
-      });
-
-      // チェックリスト
-      CHECK_DEFS.forEach(c => {
-        const el = card.querySelector(`#${p}-check-${c.key}`);
-        function toggle() {
-          el.classList.toggle('checked');
-          el.setAttribute('aria-checked', el.classList.contains('checked'));
-          save();
-        }
-        el.addEventListener('click', toggle);
-        el.addEventListener('keydown', e => {
-          if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); }
-        });
       });
 
       // 削除ボタン
